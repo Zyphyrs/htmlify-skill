@@ -1,0 +1,1190 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>last30days — Claude Code Multi-Source Research Skill</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #070810;
+        --bg2: #0d0f1a;
+        --bg3: #12152b;
+        --border: #1e2140;
+        --indigo: #818cf8;
+        --cyan: #38bdf8;
+        --green: #4ade80;
+        --yellow: #facc15;
+        --red: #f87171;
+        --muted: #6b7280;
+        --text: #e2e8f0;
+        --text2: #94a3b8;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Inter", sans-serif;
+        min-height: 100vh;
+        line-height: 1.6;
+      }
+
+      /* ── Header ── */
+      .header {
+        background: linear-gradient(135deg, var(--bg2) 0%, var(--bg3) 100%);
+        border-bottom: 1px solid var(--border);
+        padding: 2.5rem 2rem 0;
+        position: relative;
+        overflow: hidden;
+      }
+      .header::before {
+        content: "";
+        position: absolute;
+        top: -60px;
+        right: -60px;
+        width: 340px;
+        height: 340px;
+        background: radial-gradient(
+          circle,
+          rgba(56, 189, 248, 0.1) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+      .header::after {
+        content: "";
+        position: absolute;
+        bottom: -40px;
+        left: 10%;
+        width: 200px;
+        height: 200px;
+        background: radial-gradient(
+          circle,
+          rgba(74, 222, 128, 0.07) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+      .header-inner {
+        max-width: 900px;
+        margin: 0 auto;
+      }
+      .header-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: rgba(56, 189, 248, 0.1);
+        border: 1px solid rgba(56, 189, 248, 0.25);
+        color: var(--cyan);
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 0.25rem 0.7rem;
+        border-radius: 99px;
+        margin-bottom: 0.9rem;
+      }
+      .header-badge::before {
+        content: "◈";
+        font-size: 0.75rem;
+      }
+      h1 {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: clamp(1.7rem, 4vw, 2.4rem);
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--text) 30%, var(--cyan));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        line-height: 1.2;
+        margin-bottom: 0.5rem;
+      }
+      .header-sub {
+        color: var(--text2);
+        font-size: 0.95rem;
+        margin-bottom: 1.6rem;
+      }
+      .header-links {
+        display: flex;
+        gap: 0.8rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.6rem;
+      }
+      .header-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.35rem 0.85rem;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        text-decoration: none;
+        transition: opacity 0.18s;
+      }
+      .header-link:hover {
+        opacity: 0.75;
+      }
+      .link-skill {
+        background: rgba(56, 189, 248, 0.1);
+        border: 1px solid rgba(56, 189, 248, 0.25);
+        color: var(--cyan);
+      }
+      .link-version {
+        background: rgba(74, 222, 128, 0.08);
+        border: 1px solid rgba(74, 222, 128, 0.2);
+        color: var(--green);
+      }
+
+      /* ── Tabs ── */
+      .tabs {
+        display: flex;
+        gap: 0;
+        overflow-x: auto;
+        padding: 0;
+      }
+      .tab-btn {
+        padding: 0.7rem 1.2rem;
+        background: transparent;
+        border: none;
+        border-bottom: 2px solid transparent;
+        color: var(--muted);
+        font-family: "Inter", sans-serif;
+        font-size: 0.85rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition:
+          color 0.18s,
+          border-color 0.18s;
+        white-space: nowrap;
+      }
+      .tab-btn:hover {
+        color: var(--text2);
+      }
+      .tab-btn.active {
+        color: var(--cyan);
+        border-bottom-color: var(--cyan);
+      }
+
+      /* ── Main ── */
+      main {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+      .tab-panel {
+        display: none;
+      }
+      .tab-panel.active {
+        display: block;
+      }
+
+      /* ── Cards ── */
+      .card {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.25rem;
+      }
+      .card-title {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .card-title .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--cyan);
+        flex-shrink: 0;
+      }
+
+      /* ── Stats Grid ── */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.25rem;
+      }
+      .stat-card {
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1.1rem 1.2rem;
+        position: relative;
+        overflow: hidden;
+      }
+      .stat-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+      }
+      .stat-card.s-cyan::before {
+        background: linear-gradient(90deg, var(--cyan), transparent);
+      }
+      .stat-card.s-green::before {
+        background: linear-gradient(90deg, var(--green), transparent);
+      }
+      .stat-card.s-indigo::before {
+        background: linear-gradient(90deg, var(--indigo), transparent);
+      }
+      .stat-card.s-yellow::before {
+        background: linear-gradient(90deg, var(--yellow), transparent);
+      }
+      .stat-label {
+        font-size: 0.72rem;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        margin-bottom: 0.3rem;
+      }
+      .stat-value {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 1.6rem;
+        font-weight: 700;
+      }
+      .stat-card.s-cyan .stat-value {
+        color: var(--cyan);
+      }
+      .stat-card.s-green .stat-value {
+        color: var(--green);
+      }
+      .stat-card.s-indigo .stat-value {
+        color: var(--indigo);
+      }
+      .stat-card.s-yellow .stat-value {
+        color: var(--yellow);
+      }
+
+      /* ── Tags ── */
+      .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+      .tag {
+        padding: 0.25rem 0.7rem;
+        border-radius: 99px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        border: 1px solid;
+      }
+      .tag-indigo {
+        background: rgba(129, 140, 248, 0.1);
+        border-color: rgba(129, 140, 248, 0.3);
+        color: var(--indigo);
+      }
+      .tag-cyan {
+        background: rgba(56, 189, 248, 0.1);
+        border-color: rgba(56, 189, 248, 0.3);
+        color: var(--cyan);
+      }
+      .tag-green {
+        background: rgba(74, 222, 128, 0.1);
+        border-color: rgba(74, 222, 128, 0.3);
+        color: var(--green);
+      }
+      .tag-yellow {
+        background: rgba(250, 204, 21, 0.1);
+        border-color: rgba(250, 204, 21, 0.3);
+        color: var(--yellow);
+      }
+      .tag-red {
+        background: rgba(248, 113, 113, 0.1);
+        border-color: rgba(248, 113, 113, 0.3);
+        color: var(--red);
+      }
+      .tag-muted {
+        background: rgba(107, 114, 128, 0.1);
+        border-color: rgba(107, 114, 128, 0.3);
+        color: var(--muted);
+      }
+
+      /* ── Table ── */
+      .table-wrap {
+        overflow-x: auto;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.85rem;
+      }
+      thead tr {
+        background: var(--bg3);
+      }
+      th {
+        padding: 0.7rem 1rem;
+        text-align: left;
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        border-bottom: 1px solid var(--border);
+      }
+      td {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid rgba(30, 33, 64, 0.6);
+        color: var(--text2);
+        vertical-align: top;
+      }
+      td:first-child {
+        color: var(--text);
+        font-weight: 500;
+      }
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+      tbody tr:hover td {
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      /* ── Code Blocks ── */
+      pre,
+      code {
+        font-family:
+          "Fira Code", "Fira Mono", "Cascadia Code", "Consolas", monospace;
+      }
+      .code-block {
+        background: #080a14;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1.1rem 1.25rem;
+        overflow-x: auto;
+        margin: 0.6rem 0;
+      }
+      .code-block code {
+        font-size: 0.82rem;
+        color: var(--cyan);
+        line-height: 1.75;
+        white-space: pre;
+      }
+      .code-label {
+        font-size: 0.7rem;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 0.35rem;
+        margin-top: 0.8rem;
+      }
+      .code-label:first-child {
+        margin-top: 0;
+      }
+
+      /* ── Info / Warn / Note boxes ── */
+      .box {
+        border-radius: 8px;
+        padding: 0.9rem 1.1rem;
+        font-size: 0.85rem;
+        margin: 0.8rem 0;
+        display: flex;
+        gap: 0.6rem;
+      }
+      .box-icon {
+        font-size: 1rem;
+        flex-shrink: 0;
+        margin-top: 0.05rem;
+      }
+      .box.info {
+        background: rgba(56, 189, 248, 0.07);
+        border: 1px solid rgba(56, 189, 248, 0.2);
+        color: var(--cyan);
+      }
+      .box.warn {
+        background: rgba(250, 204, 21, 0.07);
+        border: 1px solid rgba(250, 204, 21, 0.2);
+        color: var(--yellow);
+      }
+      .box.note {
+        background: rgba(129, 140, 248, 0.07);
+        border: 1px solid rgba(129, 140, 248, 0.2);
+        color: var(--indigo);
+      }
+      .box.green {
+        background: rgba(74, 222, 128, 0.07);
+        border: 1px solid rgba(74, 222, 128, 0.2);
+        color: var(--green);
+      }
+      .box.muted {
+        background: rgba(107, 114, 128, 0.06);
+        border: 1px solid rgba(107, 114, 128, 0.2);
+        color: var(--muted);
+      }
+
+      /* ── Coverage Tiers ── */
+      .tiers {
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+      }
+      .tier-row {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+      .tier-pct {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 0.85rem;
+        font-weight: 700;
+        width: 3.2rem;
+        flex-shrink: 0;
+      }
+      .tier-bar-wrap {
+        flex: 1;
+        background: var(--bg3);
+        border-radius: 99px;
+        height: 7px;
+        overflow: hidden;
+      }
+      .tier-bar {
+        height: 100%;
+        border-radius: 99px;
+      }
+      .tier-label {
+        font-size: 0.8rem;
+        color: var(--text2);
+        white-space: nowrap;
+      }
+      .t40 {
+        color: var(--red);
+      }
+      .tb40 {
+        background: var(--red);
+      }
+      .t60 {
+        color: var(--yellow);
+      }
+      .tb60 {
+        background: var(--yellow);
+      }
+      .t80 {
+        color: var(--cyan);
+      }
+      .tb80 {
+        background: var(--cyan);
+      }
+      .t100 {
+        color: var(--green);
+      }
+      .tb100 {
+        background: var(--green);
+      }
+
+      /* ── Flags table ── */
+      .flags-grid {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0.4rem 0.9rem;
+        font-size: 0.85rem;
+      }
+      .flag-key {
+        font-family: "Fira Code", monospace;
+        color: var(--cyan);
+        background: rgba(56, 189, 248, 0.08);
+        border: 1px solid rgba(56, 189, 248, 0.15);
+        border-radius: 5px;
+        padding: 0.2rem 0.55rem;
+        white-space: nowrap;
+        align-self: start;
+      }
+      .flag-desc {
+        color: var(--text2);
+        padding-top: 0.2rem;
+      }
+
+      /* ── Changelog ── */
+      .changelog {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+      .cl-entry {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+      }
+      .cl-version {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 0.78rem;
+        font-weight: 700;
+        padding: 0.25rem 0.65rem;
+        border-radius: 6px;
+        white-space: nowrap;
+        flex-shrink: 0;
+        margin-top: 0.05rem;
+      }
+      .cl-v-stable {
+        background: rgba(74, 222, 128, 0.12);
+        border: 1px solid rgba(74, 222, 128, 0.25);
+        color: var(--green);
+      }
+      .cl-v-minor {
+        background: rgba(56, 189, 248, 0.1);
+        border: 1px solid rgba(56, 189, 248, 0.2);
+        color: var(--cyan);
+      }
+      .cl-v-next {
+        background: rgba(250, 204, 21, 0.1);
+        border: 1px solid rgba(250, 204, 21, 0.2);
+        color: var(--yellow);
+      }
+      .cl-body {
+        font-size: 0.88rem;
+        color: var(--text2);
+        line-height: 1.65;
+      }
+      .cl-body strong {
+        color: var(--text);
+      }
+
+      /* ── Req list ── */
+      .req-list {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      .req-list li {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.6rem;
+        font-size: 0.88rem;
+        color: var(--text2);
+      }
+      .req-list li .bullet {
+        color: var(--green);
+        flex-shrink: 0;
+      }
+
+      /* ── Source badge ── */
+      .src-icon {
+        display: inline-block;
+        width: 1.4rem;
+        height: 1.4rem;
+        border-radius: 5px;
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-align: center;
+        line-height: 1.4rem;
+        flex-shrink: 0;
+      }
+
+      /* ── Footer ── */
+      footer {
+        border-top: 1px solid var(--border);
+        padding: 1.5rem 2rem;
+        text-align: center;
+        font-size: 0.75rem;
+        color: var(--muted);
+        max-width: 900px;
+        margin: 2rem auto 0;
+      }
+      footer span {
+        color: var(--cyan);
+      }
+
+      /* ── Scrollbar ── */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--bg2);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 3px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div class="header-inner">
+        <div class="header-badge">Claude Code Skill</div>
+        <h1>last30days</h1>
+        <p class="header-sub">
+          Multi-source research skill — Reddit, X, YouTube, TikTok, HN,
+          Polymarket, Instagram + web, all in one run
+        </p>
+        <div class="header-links">
+          <a class="header-link link-skill" href="#">◈ Claude Code Skill</a>
+          <a class="header-link link-version" href="#">v2.9.5 stable</a>
+        </div>
+        <div class="tabs" role="tablist">
+          <button class="tab-btn active" data-tab="overview" role="tab">
+            Overview
+          </button>
+          <button class="tab-btn" data-tab="sources" role="tab">Sources</button>
+          <button class="tab-btn" data-tab="setup" role="tab">Setup</button>
+          <button class="tab-btn" data-tab="usage" role="tab">Usage</button>
+          <button class="tab-btn" data-tab="changelog" role="tab">
+            Changelog
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <main>
+      <!-- ════ OVERVIEW ════ -->
+      <div class="tab-panel active" id="tab-overview">
+        <div class="stats-grid">
+          <div class="stat-card s-cyan">
+            <div class="stat-label">Stars</div>
+            <div class="stat-value">17K+</div>
+          </div>
+          <div class="stat-card s-green">
+            <div class="stat-label">Sources</div>
+            <div class="stat-value">10+</div>
+          </div>
+          <div class="stat-card s-indigo">
+            <div class="stat-label">Version</div>
+            <div class="stat-value">2.9.5</div>
+          </div>
+          <div class="stat-card s-yellow">
+            <div class="stat-label">API Keys Required</div>
+            <div class="stat-value">0</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <span class="dot"></span>What is last30days?
+          </div>
+          <p
+            style="
+              color: var(--text2);
+              font-size: 0.9rem;
+              line-height: 1.75;
+              margin-bottom: 0.9rem;
+            "
+          >
+            <strong style="color: var(--text)">last30days</strong> is a Claude
+            Code skill that researches any topic across the last 30 days of
+            internet activity. A single command sweeps Reddit threads, X/Twitter
+            posts, YouTube videos, TikTok content, Hacker News discussions,
+            Polymarket prediction markets, Instagram, and the open web — then
+            synthesizes a briefing.
+          </p>
+          <p style="color: var(--text2); font-size: 0.9rem; line-height: 1.75">
+            Zero mandatory API keys for the base run. Unlock deeper coverage
+            layer by layer as you add optional keys. Briefings are auto-saved so
+            you can build a research archive over time.
+          </p>
+          <div class="tags" style="margin-top: 1rem">
+            <span class="tag tag-cyan">Claude Code Skill</span>
+            <span class="tag tag-green">Multi-Source</span>
+            <span class="tag tag-indigo">Research</span>
+            <span class="tag tag-yellow">No API Key Required</span>
+            <span class="tag tag-cyan">Auto-Save Briefings</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><span class="dot"></span>Coverage Tiers</div>
+          <p
+            style="color: var(--text2); font-size: 0.83rem; margin-bottom: 1rem"
+          >
+            Coverage depth scales with what you configure — zero keys still gets
+            you a useful baseline.
+          </p>
+          <div class="tiers">
+            <div class="tier-row">
+              <span class="tier-pct t40">40%</span>
+              <div class="tier-bar-wrap">
+                <div class="tier-bar tb40" style="width: 40%"></div>
+              </div>
+              <span class="tier-label"
+                >Base — no keys. Web search + HN + Polymarket.</span
+              >
+            </div>
+            <div class="tier-row">
+              <span class="tier-pct t60">60%</span>
+              <div class="tier-bar-wrap">
+                <div class="tier-bar tb60" style="width: 60%"></div>
+              </div>
+              <span class="tier-label"
+                >+ ScrapeCreators free tier. Unlocks Reddit + YouTube.</span
+              >
+            </div>
+            <div class="tier-row">
+              <span class="tier-pct t80">80%</span>
+              <div class="tier-bar-wrap">
+                <div class="tier-bar tb80" style="width: 80%"></div>
+              </div>
+              <span class="tier-label"
+                >+ X/Twitter handle. Adds X posts + thread context.</span
+              >
+            </div>
+            <div class="tier-row">
+              <span class="tier-pct t100">100%</span>
+              <div class="tier-bar-wrap">
+                <div class="tier-bar tb100" style="width: 100%"></div>
+              </div>
+              <span class="tier-label"
+                >+ ScrapeCreators paid. Full Reddit comments + TikTok +
+                Instagram.</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="box muted">
+          <span class="box-icon">◇</span>
+          <div>
+            last30days has no affiliation with any API provider — no referrals,
+            no kickbacks. Tool recommendations are purely based on what works
+            best for the job.
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ SOURCES ════ -->
+      <div class="tab-panel" id="tab-sources">
+        <div class="card" style="padding: 0; overflow: hidden">
+          <div
+            style="
+              padding: 1.1rem 1.4rem 0.6rem;
+              font-family: &quot;Space Grotesk&quot;, sans-serif;
+              font-size: 1rem;
+              font-weight: 600;
+              color: var(--text);
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
+            "
+          >
+            <span class="dot"></span>Source Registry
+          </div>
+          <div class="table-wrap" style="border: none; border-radius: 0">
+            <table>
+              <thead>
+                <tr>
+                  <th>Source</th>
+                  <th>Requires</th>
+                  <th>What You Get</th>
+                  <th>Quality Weight</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Reddit (posts)</td>
+                  <td>
+                    <span class="tag tag-green" style="font-size: 0.7rem"
+                      >ScrapeCreators free</span
+                    >
+                  </td>
+                  <td>Top posts, scores, subreddit context</td>
+                  <td><span style="color: var(--green)">High</span></td>
+                </tr>
+                <tr>
+                  <td>Reddit (comments)</td>
+                  <td>
+                    <span class="tag tag-cyan" style="font-size: 0.7rem"
+                      >ScrapeCreators paid</span
+                    >
+                  </td>
+                  <td>Full comment threads, nested context</td>
+                  <td><span style="color: var(--green)">High</span></td>
+                </tr>
+                <tr>
+                  <td>X / Twitter</td>
+                  <td>
+                    <span class="tag tag-indigo" style="font-size: 0.7rem"
+                      >--x-handle flag</span
+                    >
+                  </td>
+                  <td>Recent tweets, replies, quote context</td>
+                  <td><span style="color: var(--cyan)">Medium-High</span></td>
+                </tr>
+                <tr>
+                  <td>YouTube</td>
+                  <td>
+                    <span class="tag tag-green" style="font-size: 0.7rem"
+                      >ScrapeCreators free</span
+                    >
+                  </td>
+                  <td>Video titles, descriptions, comment samples</td>
+                  <td><span style="color: var(--cyan)">Medium</span></td>
+                </tr>
+                <tr>
+                  <td>TikTok</td>
+                  <td>
+                    <span class="tag tag-cyan" style="font-size: 0.7rem"
+                      >ScrapeCreators paid</span
+                    >
+                  </td>
+                  <td>Captions, trending sounds, view counts</td>
+                  <td><span style="color: var(--yellow)">Medium</span></td>
+                </tr>
+                <tr>
+                  <td>Instagram</td>
+                  <td>
+                    <span class="tag tag-cyan" style="font-size: 0.7rem"
+                      >ScrapeCreators paid</span
+                    >
+                  </td>
+                  <td>Posts, captions, engagement signals</td>
+                  <td><span style="color: var(--yellow)">Medium</span></td>
+                </tr>
+                <tr>
+                  <td>Hacker News</td>
+                  <td>
+                    <span class="tag tag-green" style="font-size: 0.7rem"
+                      >No key needed</span
+                    >
+                  </td>
+                  <td>Top stories, Ask HN, Show HN, comments</td>
+                  <td><span style="color: var(--green)">High</span></td>
+                </tr>
+                <tr>
+                  <td>Polymarket</td>
+                  <td>
+                    <span class="tag tag-green" style="font-size: 0.7rem"
+                      >No key needed</span
+                    >
+                  </td>
+                  <td>Active prediction markets, probabilities</td>
+                  <td>
+                    <span style="color: var(--indigo)">Unique signal</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Web Search</td>
+                  <td>
+                    <span class="tag tag-green" style="font-size: 0.7rem"
+                      >No key needed</span
+                    >
+                  </td>
+                  <td>News articles, blogs, press releases</td>
+                  <td><span style="color: var(--cyan)">Medium</span></td>
+                </tr>
+                <tr>
+                  <td>Firecrawl / Scrape</td>
+                  <td>
+                    <span class="tag tag-muted" style="font-size: 0.7rem"
+                      >Optional</span
+                    >
+                  </td>
+                  <td>Deep page scrapes for specific URLs</td>
+                  <td><span style="color: var(--muted)">Contextual</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="box info">
+          <span class="box-icon">◈</span>
+          <div>
+            Cross-platform signal convergence is the strongest signal. When
+            Reddit, X, and HN all discuss the same topic independently, that's a
+            high-confidence trend — not noise.
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ SETUP ════ -->
+      <div class="tab-panel" id="tab-setup">
+        <div class="card">
+          <div class="card-title">
+            <span class="dot"></span>Install via add-skill
+          </div>
+          <div class="code-label">One-liner install</div>
+          <div class="code-block"><code>/add-skill last30days</code></div>
+          <p
+            style="font-size: 0.83rem; color: var(--muted); margin-top: 0.5rem"
+          >
+            Requires Claude Code with the add-skill helper configured. The skill
+            is added to your active Claude Code session.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><span class="dot"></span>Auto Setup</div>
+          <p
+            style="
+              font-size: 0.88rem;
+              color: var(--text2);
+              margin-bottom: 0.8rem;
+            "
+          >
+            Run the built-in setup wizard to configure sources interactively:
+          </p>
+          <div class="code-block"><code>/last30days setup</code></div>
+          <p
+            style="font-size: 0.83rem; color: var(--muted); margin-top: 0.5rem"
+          >
+            The wizard walks through each source, checks what's already
+            configured, and prompts for missing keys only.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <span class="dot"></span>Manual .env Config
+          </div>
+          <div class="code-label">All supported keys</div>
+          <div class="code-block">
+            <code
+              ># Required for nothing — all optional
+              SCRAPECREATORS_API_KEY=sc_... # Reddit comments, TikTok, Instagram
+              TWITTER_BEARER_TOKEN=AAAA... # X/Twitter posts (or use --x-handle)
+              FIRECRAWL_API_KEY=fc-... # Deep URL scraping
+              YOUTUBE_API_KEY=AIza... # YouTube search (ScrapeCreators fallback)
+              POLYMARKET_API_KEY= # Public API, key optional # Output directory
+              (default: ~/Documents/Last30Days/)
+              LAST30DAYS_OUTPUT_DIR=~/Documents/Last30Days/</code
+            >
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><span class="dot"></span>ScrapeCreators</div>
+          <p
+            style="
+              font-size: 0.88rem;
+              color: var(--text2);
+              line-height: 1.7;
+              margin-bottom: 0.8rem;
+            "
+          >
+            ScrapeCreators is the recommended data layer for social platforms.
+            The free tier gives you
+            <strong style="color: var(--green)">100 free API calls</strong>
+            which unlocks Reddit posts and YouTube in the base run. Paid tier
+            unlocks Reddit comments, TikTok, and Instagram.
+          </p>
+          <ul class="req-list">
+            <li>
+              <span class="bullet">✓</span> Sign up at scrapecreators.com — no
+              credit card for free tier
+            </li>
+            <li>
+              <span class="bullet">✓</span> Copy your API key and add to
+              <code style="color: var(--cyan); font-size: 0.8rem"
+                >SCRAPECREATORS_API_KEY</code
+              >
+            </li>
+            <li><span class="bullet">✓</span> Free tier resets monthly</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ════ USAGE ════ -->
+      <div class="tab-panel" id="tab-usage">
+        <div class="card">
+          <div class="card-title">
+            <span class="dot"></span>Command Examples
+          </div>
+          <div class="code-block">
+            <code
+              ># Basic research run /last30days "vibe coding trend" # Quick mode
+              — fewer sources, faster output /last30days "AI agents" --quick #
+              Deep dive — all sources, longer context /last30days "Claude Code"
+              --deep # Custom date window (default is 30 days) /last30days "llm
+              benchmarks" --days=7 # Run as background agent (non-blocking)
+              /last30days "crypto market sentiment" --agent # Include X/Twitter
+              from a specific handle's perspective /last30days "indie hacking"
+              --x-handle=levelsio # Deep + save to custom path /last30days "open
+              source LLMs" --deep --days=14</code
+            >
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><span class="dot"></span>Output Format</div>
+          <p
+            style="
+              font-size: 0.88rem;
+              color: var(--text2);
+              line-height: 1.7;
+              margin-bottom: 0.8rem;
+            "
+          >
+            Each run produces a structured markdown briefing saved to
+            <code style="color: var(--cyan); font-size: 0.8rem"
+              >~/Documents/Last30Days/</code
+            >. The briefing contains:
+          </p>
+          <ul class="req-list">
+            <li>
+              <span class="bullet">→</span> Executive summary (3–5 bullet
+              points)
+            </li>
+            <li>
+              <span class="bullet">→</span> Per-source signal summary with top
+              posts/links
+            </li>
+            <li>
+              <span class="bullet">→</span> Cross-platform convergence
+              highlights
+            </li>
+            <li>
+              <span class="bullet">→</span> Sentiment polarity per platform
+            </li>
+            <li>
+              <span class="bullet">→</span> Prediction market probability if
+              Polymarket has relevant markets
+            </li>
+            <li>
+              <span class="bullet">→</span> Raw source metadata for follow-up
+              research
+            </li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><span class="dot"></span>Flags Reference</div>
+          <div class="flags-grid">
+            <span class="flag-key">--quick</span>
+            <span class="flag-desc"
+              >Fast mode — web + HN + Polymarket only. Returns in ~30
+              seconds.</span
+            >
+
+            <span class="flag-key">--deep</span>
+            <span class="flag-desc"
+              >All configured sources, extended context window per source,
+              longer synthesis.</span
+            >
+
+            <span class="flag-key">--days=N</span>
+            <span class="flag-desc"
+              >Override the default 30-day window. Use 7 for week-in-review, 90
+              for quarterly.</span
+            >
+
+            <span class="flag-key">--agent</span>
+            <span class="flag-desc"
+              >Run as a background subagent. Claude Code continues responding
+              while research runs.</span
+            >
+
+            <span class="flag-key">--x-handle=</span>
+            <span class="flag-desc"
+              >Pass a Twitter/X handle to focus X research through that
+              account's network and replies.</span
+            >
+
+            <span class="flag-key">--no-save</span>
+            <span class="flag-desc"
+              >Skip auto-save. Output is printed inline only, nothing written to
+              disk.</span
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ CHANGELOG ════ -->
+      <div class="tab-panel" id="tab-changelog">
+        <div class="card">
+          <div class="card-title"><span class="dot"></span>Release Notes</div>
+          <div class="changelog">
+            <div class="cl-entry">
+              <span class="cl-version cl-v-stable">v2.9.5</span>
+              <div class="cl-body">
+                <strong>ScrapeCreators as Reddit default.</strong> Replaced the
+                previous Reddit scraper with ScrapeCreators as the primary
+                Reddit data layer — more reliable, higher rate limits, cleaner
+                post data. Complete briefings are now saved to disk
+                automatically on every run, no flag required.
+              </div>
+            </div>
+
+            <div class="cl-entry">
+              <span class="cl-version cl-v-minor">v2.9.1</span>
+              <div class="cl-body">
+                <strong>Auto-save briefings.</strong> Briefings are now
+                automatically saved to
+                <code style="color: var(--cyan); font-size: 0.8rem"
+                  >~/Documents/Last30Days/</code
+                >
+                after every run. Filenames include topic slug + timestamp for
+                easy archive browsing. Configurable via
+                <code style="color: var(--cyan); font-size: 0.8rem"
+                  >LAST30DAYS_OUTPUT_DIR</code
+                >.
+              </div>
+            </div>
+
+            <div class="cl-entry">
+              <span class="cl-version cl-v-next">v3.0 (upcoming)</span>
+              <div class="cl-body">
+                <strong>Instagram + TikTok opt-in.</strong> Full social video
+                coverage as first-class sources. New source status dashboard
+                shown at the start of each run — shows which sources are active,
+                which are skipped, and why. Cleaner setup wizard with source
+                health checks.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="box green">
+          <span class="box-icon">✓</span>
+          <div>
+            v2.9.5 is the current stable release. The v3.0 branch is in active
+            development — Instagram and TikTok support is behind an opt-in flag
+            while it stabilizes.
+          </div>
+        </div>
+
+        <div class="box note">
+          <span class="box-icon">◈</span>
+          <div>
+            Skill updates are pulled automatically when you run
+            <code style="color: var(--indigo); font-size: 0.82rem"
+              >/add-skill last30days</code
+            >
+            again. No manual version management needed.
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      Built by
+      <a href="https://github.com/Zyphyrs" style="color: inherit">Zyphyrs</a>
+      with Claude Code
+    </footer>
+
+    <script>
+      const tabs = document.querySelectorAll(".tab-btn");
+      const panels = document.querySelectorAll(".tab-panel");
+
+      tabs.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const target = btn.dataset.tab;
+
+          tabs.forEach((t) => t.classList.remove("active"));
+          panels.forEach((p) => p.classList.remove("active"));
+
+          btn.classList.add("active");
+          document.getElementById("tab-" + target).classList.add("active");
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>htmlify — Sample Outputs</title>
+    <style>
+      :root {
+        --bg: #070810;
+        --bg2: #0d0f1a;
+        --bg3: #12152b;
+        --border: #1e2140;
+        --indigo: #818cf8;
+        --cyan: #38bdf8;
+        --green: #4ade80;
+        --text: #e2e8f0;
+        --text2: #94a3b8;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: Inter, system-ui, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+      }
+      h1 {
+        font-size: 2rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--indigo), var(--cyan));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 8px;
+      }
+      p {
+        color: var(--text2);
+        margin-bottom: 40px;
+        font-size: 15px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        max-width: 700px;
+        width: 100%;
+      }
+      .card {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 28px;
+        transition: border-color 0.15s;
+        text-decoration: none;
+      }
+      .card:hover {
+        border-color: var(--indigo);
+      }
+      .card h2 {
+        font-size: 1rem;
+        color: var(--indigo);
+        margin-bottom: 8px;
+      }
+      .card p {
+        font-size: 13px;
+        color: var(--text2);
+        margin: 0;
+      }
+      .badge {
+        display: inline-block;
+        padding: 2px 10px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        background: rgba(56, 189, 248, 0.12);
+        color: var(--cyan);
+        margin-top: 12px;
+      }
+      .footer {
+        margin-top: 48px;
+        font-size: 12px;
+        color: var(--text2);
+      }
+      .footer a {
+        color: var(--indigo);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>htmlify</h1>
+    <p>Any content → beautiful HTML reference. Sample outputs below.</p>
+    <div class="grid">
+      <a class="card" href="trading-agents-reference.html">
+        <h2>TradingAgents</h2>
+        <p>
+          Multi-agent LLM trading framework by TauricResearch. 7 specialized
+          agents, multi-provider LLM support.
+        </p>
+        <span class="badge">GitHub README</span>
+      </a>
+      <a class="card" href="last30days-reference.html">
+        <h2>last30days-skill</h2>
+        <p>
+          Claude Code research skill. Any topic across Reddit, X, YouTube, HN,
+          Polymarket in 30 days.
+        </p>
+        <span class="badge">GitHub README</span>
+      </a>
+    </div>
+    <div class="footer">
+      Built by <a href="https://github.com/Zyphyrs">Zyphyrs</a> with Claude Code
+      &nbsp;·&nbsp;
+      <a href="https://github.com/Zyphyrs/htmlify-skill"
+        >github.com/Zyphyrs/htmlify-skill</a
+      >
+    </div>
+  </body>
+</html>

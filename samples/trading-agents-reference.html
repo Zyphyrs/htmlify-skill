@@ -1,0 +1,1205 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TradingAgents — Multi-Agent LLM Trading Framework</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #070810;
+        --bg2: #0d0f1a;
+        --bg3: #12152b;
+        --border: #1e2140;
+        --indigo: #818cf8;
+        --cyan: #38bdf8;
+        --green: #4ade80;
+        --yellow: #facc15;
+        --red: #f87171;
+        --muted: #6b7280;
+        --text: #e2e8f0;
+        --text2: #94a3b8;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Inter", sans-serif;
+        min-height: 100vh;
+        line-height: 1.6;
+      }
+
+      /* ── Header ── */
+      .header {
+        background: linear-gradient(135deg, var(--bg2) 0%, var(--bg3) 100%);
+        border-bottom: 1px solid var(--border);
+        padding: 2.5rem 2rem 0;
+        position: relative;
+        overflow: hidden;
+      }
+      .header::before {
+        content: "";
+        position: absolute;
+        top: -60px;
+        right: -60px;
+        width: 320px;
+        height: 320px;
+        background: radial-gradient(
+          circle,
+          rgba(129, 140, 248, 0.12) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+      .header-inner {
+        max-width: 900px;
+        margin: 0 auto;
+      }
+      .header-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: rgba(129, 140, 248, 0.12);
+        border: 1px solid rgba(129, 140, 248, 0.25);
+        color: var(--indigo);
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 0.25rem 0.7rem;
+        border-radius: 99px;
+        margin-bottom: 0.9rem;
+      }
+      .header-badge::before {
+        content: "◈";
+        font-size: 0.75rem;
+      }
+      h1 {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: clamp(1.7rem, 4vw, 2.4rem);
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--text) 30%, var(--indigo));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        line-height: 1.2;
+        margin-bottom: 0.5rem;
+      }
+      .header-sub {
+        color: var(--text2);
+        font-size: 0.95rem;
+        margin-bottom: 1.6rem;
+      }
+      .header-links {
+        display: flex;
+        gap: 0.8rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.6rem;
+      }
+      .header-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.35rem 0.85rem;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        text-decoration: none;
+        transition: opacity 0.18s;
+      }
+      .header-link:hover {
+        opacity: 0.75;
+      }
+      .link-github {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid var(--border);
+        color: var(--text);
+      }
+      .link-pip {
+        background: rgba(56, 189, 248, 0.1);
+        border: 1px solid rgba(56, 189, 248, 0.25);
+        color: var(--cyan);
+      }
+
+      /* ── Tabs ── */
+      .tabs {
+        display: flex;
+        gap: 0;
+        overflow-x: auto;
+        border-bottom: none;
+        padding: 0;
+      }
+      .tab-btn {
+        padding: 0.7rem 1.2rem;
+        background: transparent;
+        border: none;
+        border-bottom: 2px solid transparent;
+        color: var(--muted);
+        font-family: "Inter", sans-serif;
+        font-size: 0.85rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition:
+          color 0.18s,
+          border-color 0.18s;
+        white-space: nowrap;
+      }
+      .tab-btn:hover {
+        color: var(--text2);
+      }
+      .tab-btn.active {
+        color: var(--indigo);
+        border-bottom-color: var(--indigo);
+      }
+
+      /* ── Main ── */
+      main {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+
+      .tab-panel {
+        display: none;
+      }
+      .tab-panel.active {
+        display: block;
+      }
+
+      /* ── Cards ── */
+      .card {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.25rem;
+      }
+      .card-title {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .card-title .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--indigo);
+        flex-shrink: 0;
+      }
+
+      /* ── Stats Grid ── */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.25rem;
+      }
+      .stat-card {
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1.1rem 1.2rem;
+        position: relative;
+        overflow: hidden;
+      }
+      .stat-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+      }
+      .stat-card.s-indigo::before {
+        background: linear-gradient(90deg, var(--indigo), transparent);
+      }
+      .stat-card.s-cyan::before {
+        background: linear-gradient(90deg, var(--cyan), transparent);
+      }
+      .stat-card.s-green::before {
+        background: linear-gradient(90deg, var(--green), transparent);
+      }
+      .stat-card.s-yellow::before {
+        background: linear-gradient(90deg, var(--yellow), transparent);
+      }
+      .stat-label {
+        font-size: 0.72rem;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        margin-bottom: 0.3rem;
+      }
+      .stat-value {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 1.6rem;
+        font-weight: 700;
+      }
+      .stat-card.s-indigo .stat-value {
+        color: var(--indigo);
+      }
+      .stat-card.s-cyan .stat-value {
+        color: var(--cyan);
+      }
+      .stat-card.s-green .stat-value {
+        color: var(--green);
+      }
+      .stat-card.s-yellow .stat-value {
+        color: var(--yellow);
+      }
+
+      /* ── Tags ── */
+      .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 0.8rem;
+      }
+      .tag {
+        padding: 0.25rem 0.7rem;
+        border-radius: 99px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        border: 1px solid;
+      }
+      .tag-indigo {
+        background: rgba(129, 140, 248, 0.1);
+        border-color: rgba(129, 140, 248, 0.3);
+        color: var(--indigo);
+      }
+      .tag-cyan {
+        background: rgba(56, 189, 248, 0.1);
+        border-color: rgba(56, 189, 248, 0.3);
+        color: var(--cyan);
+      }
+      .tag-green {
+        background: rgba(74, 222, 128, 0.1);
+        border-color: rgba(74, 222, 128, 0.3);
+        color: var(--green);
+      }
+      .tag-yellow {
+        background: rgba(250, 204, 21, 0.1);
+        border-color: rgba(250, 204, 21, 0.3);
+        color: var(--yellow);
+      }
+      .tag-red {
+        background: rgba(248, 113, 113, 0.1);
+        border-color: rgba(248, 113, 113, 0.3);
+        color: var(--red);
+      }
+
+      /* ── Table ── */
+      .table-wrap {
+        overflow-x: auto;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.85rem;
+      }
+      thead tr {
+        background: var(--bg3);
+      }
+      th {
+        padding: 0.7rem 1rem;
+        text-align: left;
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        border-bottom: 1px solid var(--border);
+      }
+      td {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid rgba(30, 33, 64, 0.6);
+        color: var(--text2);
+        vertical-align: top;
+      }
+      td:first-child {
+        color: var(--text);
+        font-weight: 500;
+      }
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+      tbody tr:hover td {
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      /* ── Code Blocks ── */
+      pre,
+      code {
+        font-family:
+          "Fira Code", "Fira Mono", "Cascadia Code", "Consolas", monospace;
+      }
+      .code-block {
+        background: #080a14;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1.1rem 1.25rem;
+        overflow-x: auto;
+        margin: 0.6rem 0;
+      }
+      .code-block code {
+        font-size: 0.82rem;
+        color: var(--cyan);
+        line-height: 1.7;
+        white-space: pre;
+      }
+      .code-label {
+        font-size: 0.7rem;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 0.35rem;
+      }
+
+      /* ── Info / Warn / Note boxes ── */
+      .box {
+        border-radius: 8px;
+        padding: 0.9rem 1.1rem;
+        font-size: 0.85rem;
+        margin: 0.8rem 0;
+        display: flex;
+        gap: 0.6rem;
+      }
+      .box-icon {
+        font-size: 1rem;
+        flex-shrink: 0;
+        margin-top: 0.05rem;
+      }
+      .box.info {
+        background: rgba(56, 189, 248, 0.07);
+        border: 1px solid rgba(56, 189, 248, 0.2);
+        color: var(--cyan);
+      }
+      .box.warn {
+        background: rgba(250, 204, 21, 0.07);
+        border: 1px solid rgba(250, 204, 21, 0.2);
+        color: var(--yellow);
+      }
+      .box.note {
+        background: rgba(129, 140, 248, 0.07);
+        border: 1px solid rgba(129, 140, 248, 0.2);
+        color: var(--indigo);
+      }
+      .box.green {
+        background: rgba(74, 222, 128, 0.07);
+        border: 1px solid rgba(74, 222, 128, 0.2);
+        color: var(--green);
+      }
+
+      /* ── Verdict Card ── */
+      .verdict {
+        background: linear-gradient(
+          135deg,
+          rgba(129, 140, 248, 0.08),
+          rgba(56, 189, 248, 0.05)
+        );
+        border: 1px solid rgba(129, 140, 248, 0.2);
+        border-radius: 12px;
+        padding: 1.2rem 1.4rem;
+        margin-bottom: 1.25rem;
+      }
+      .verdict-label {
+        font-size: 0.7rem;
+        color: var(--indigo);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        font-weight: 600;
+        margin-bottom: 0.4rem;
+      }
+      .verdict-text {
+        color: var(--text);
+        font-size: 0.92rem;
+        line-height: 1.6;
+      }
+
+      /* ── Pipeline Flow ── */
+      .pipeline {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem;
+        background: var(--bg3);
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        margin: 0.8rem 0;
+      }
+      .pipeline-node {
+        padding: 0.45rem 0.9rem;
+        border-radius: 7px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        border: 1px solid;
+      }
+      .pn-indigo {
+        background: rgba(129, 140, 248, 0.12);
+        border-color: rgba(129, 140, 248, 0.3);
+        color: var(--indigo);
+      }
+      .pn-cyan {
+        background: rgba(56, 189, 248, 0.12);
+        border-color: rgba(56, 189, 248, 0.3);
+        color: var(--cyan);
+      }
+      .pn-green {
+        background: rgba(74, 222, 128, 0.12);
+        border-color: rgba(74, 222, 128, 0.3);
+        color: var(--green);
+      }
+      .pn-yellow {
+        background: rgba(250, 204, 21, 0.12);
+        border-color: rgba(250, 204, 21, 0.3);
+        color: var(--yellow);
+      }
+      .pipe-arrow {
+        color: var(--muted);
+        font-size: 1rem;
+      }
+
+      /* ── Flow Diagram ── */
+      .flow-diagram {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 24px 16px 16px;
+        gap: 0;
+      }
+      .flow-group {
+        border: 1px solid rgba(129, 140, 248, 0.45);
+        border-radius: 14px;
+        padding: 20px 16px 16px;
+        width: 100%;
+        max-width: 640px;
+        position: relative;
+        background: rgba(129, 140, 248, 0.03);
+      }
+      .flow-group-label {
+        position: absolute;
+        top: -11px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--bg2);
+        padding: 0 14px;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        color: var(--indigo);
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+      .flow-agents {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+      }
+      .flow-node {
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 12px 10px;
+        text-align: center;
+        min-width: 140px;
+      }
+      .flow-node.analyst {
+        border-color: rgba(129, 140, 248, 0.35);
+      }
+      .flow-node.researcher {
+        border-color: rgba(56, 189, 248, 0.5);
+        min-width: 200px;
+      }
+      .flow-node.trader {
+        border-color: rgba(74, 222, 128, 0.5);
+        min-width: 200px;
+      }
+      .flow-node.risk {
+        border-color: rgba(250, 204, 21, 0.5);
+        min-width: 200px;
+      }
+      .flow-node.fund {
+        border-color: rgba(129, 140, 248, 0.6);
+        min-width: 200px;
+        background: rgba(129, 140, 248, 0.06);
+      }
+      .node-name {
+        font-weight: 700;
+        font-size: 13px;
+        color: var(--text);
+        margin-bottom: 4px;
+      }
+      .node-source {
+        font-size: 11px;
+        color: var(--text2);
+      }
+      .flow-arrow {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0;
+        padding: 2px 0;
+        color: var(--muted);
+      }
+      .flow-arrow .line {
+        width: 2px;
+        height: 18px;
+        background: var(--border);
+      }
+      .flow-arrow .head {
+        font-size: 12px;
+        line-height: 1;
+      }
+
+      /* ── Req list ── */
+      .req-list {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      .req-list li {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.6rem;
+        font-size: 0.88rem;
+        color: var(--text2);
+      }
+      .req-list li .bullet {
+        color: var(--green);
+        flex-shrink: 0;
+        margin-top: 0.05rem;
+      }
+
+      /* ── Footer ── */
+      footer {
+        border-top: 1px solid var(--border);
+        padding: 1.5rem 2rem;
+        text-align: center;
+        font-size: 0.75rem;
+        color: var(--muted);
+        max-width: 900px;
+        margin: 2rem auto 0;
+      }
+      footer span {
+        color: var(--indigo);
+      }
+
+      /* ── Scrollbar ── */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--bg2);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 3px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div class="header-inner">
+        <div class="header-badge">TauricResearch / TradingAgents</div>
+        <h1>TradingAgents</h1>
+        <p class="header-sub">
+          Multi-Agent LLM Trading Framework — 7 specialized agents collaborating
+          like a real trading firm
+        </p>
+        <div class="header-links">
+          <a class="header-link link-github" href="#"
+            >⬡ GitHub — TauricResearch/TradingAgents</a
+          >
+          <a class="header-link link-pip" href="#"
+            >⬡ pip install tradingagents</a
+          >
+        </div>
+        <div class="tabs" role="tablist">
+          <button class="tab-btn active" data-tab="overview" role="tab">
+            Overview
+          </button>
+          <button class="tab-btn" data-tab="agents" role="tab">Agents</button>
+          <button class="tab-btn" data-tab="setup" role="tab">Setup</button>
+          <button class="tab-btn" data-tab="architecture" role="tab">
+            Architecture
+          </button>
+          <button class="tab-btn" data-tab="llm" role="tab">LLM Support</button>
+        </div>
+      </div>
+    </div>
+
+    <main>
+      <!-- ════ OVERVIEW ════ -->
+      <div class="tab-panel active" id="tab-overview">
+        <div class="stats-grid">
+          <div class="stat-card s-indigo">
+            <div class="stat-label">GitHub Stars</div>
+            <div class="stat-value">45.6K</div>
+          </div>
+          <div class="stat-card s-cyan">
+            <div class="stat-label">Agents</div>
+            <div class="stat-value">7</div>
+          </div>
+          <div class="stat-card s-green">
+            <div class="stat-label">Forks</div>
+            <div class="stat-value">8.3K</div>
+          </div>
+          <div class="stat-card s-yellow">
+            <div class="stat-label">License</div>
+            <div class="stat-value">MIT</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <span class="dot"></span>What is TradingAgents?
+          </div>
+          <p
+            style="
+              color: var(--text2);
+              font-size: 0.9rem;
+              line-height: 1.75;
+              margin-bottom: 0.9rem;
+            "
+          >
+            TradingAgents is a multi-agent framework that mirrors the structure
+            of a real-world trading firm. Seven specialized LLM-powered agents
+            each own a distinct domain — fundamentals, sentiment, news,
+            technical analysis, research, execution, and risk — and collaborate
+            in a structured pipeline to evaluate market conditions and inform
+            trading decisions.
+          </p>
+          <p style="color: var(--text2); font-size: 0.9rem; line-height: 1.75">
+            Built on LangGraph and Python, the framework is provider-agnostic:
+            you can plug in OpenAI, Anthropic, Google Gemini, xAI Grok,
+            OpenRouter, or local Ollama models at each agent node.
+          </p>
+          <div class="tags" style="margin-top: 1rem">
+            <span class="tag tag-indigo">Multi-Agent</span>
+            <span class="tag tag-cyan">LLM Trading</span>
+            <span class="tag tag-green">Python</span>
+            <span class="tag tag-yellow">LangGraph</span>
+            <span class="tag tag-indigo">Financial AI</span>
+          </div>
+        </div>
+
+        <div class="verdict">
+          <div class="verdict-label">Quick Verdict</div>
+          <div class="verdict-text">
+            Best suited for crypto and equity alpha research workflows.
+            Python-native with multi-provider LLM support — swap models per
+            agent node without touching core logic. Not a live trading bot;
+            outputs are decision-support signals, not automated order execution.
+          </div>
+        </div>
+
+        <div class="box note">
+          <span class="box-icon">◈</span>
+          <div>
+            TradingAgents is a research framework, not a live brokerage
+            integration. Always backtest and paper-trade before deploying
+            signals in a live environment.
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ AGENTS ════ -->
+      <div class="tab-panel" id="tab-agents">
+        <div class="card" style="padding: 0; overflow: hidden">
+          <div class="table-wrap" style="border: none; border-radius: 0">
+            <table>
+              <thead>
+                <tr>
+                  <th>Agent</th>
+                  <th>Role</th>
+                  <th>Data Source</th>
+                  <th>Output</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <span class="tag tag-indigo" style="white-space: nowrap"
+                      >Fundamentals Analyst</span
+                    >
+                  </td>
+                  <td>Evaluate financial health & valuation metrics</td>
+                  <td>SEC filings, earnings, balance sheets</td>
+                  <td>Fundamental score + commentary</td>
+                </tr>
+                <tr>
+                  <td>
+                    <span class="tag tag-cyan" style="white-space: nowrap"
+                      >Sentiment Analyst</span
+                    >
+                  </td>
+                  <td>Gauge market mood and social signals</td>
+                  <td>Reddit, Twitter/X, StockTwits, news sentiment</td>
+                  <td>Sentiment polarity + crowd signal</td>
+                </tr>
+                <tr>
+                  <td>
+                    <span class="tag tag-yellow" style="white-space: nowrap"
+                      >News Analyst</span
+                    >
+                  </td>
+                  <td>Summarize and weight recent news events</td>
+                  <td>Financial news APIs, press releases</td>
+                  <td>News impact summary + risk flags</td>
+                </tr>
+                <tr>
+                  <td>
+                    <span class="tag tag-green" style="white-space: nowrap"
+                      >Technical Analyst</span
+                    >
+                  </td>
+                  <td>Interpret price action and technical patterns</td>
+                  <td>OHLCV price/volume data, indicators</td>
+                  <td>Technical bias + entry/exit levels</td>
+                </tr>
+                <tr>
+                  <td>
+                    <span class="tag tag-indigo" style="white-space: nowrap"
+                      >Researcher</span
+                    >
+                  </td>
+                  <td>Synthesize all analyst outputs into a thesis</td>
+                  <td>Outputs of all 4 analyst agents</td>
+                  <td>Investment thesis + conviction level</td>
+                </tr>
+                <tr>
+                  <td>
+                    <span class="tag tag-cyan" style="white-space: nowrap"
+                      >Trader</span
+                    >
+                  </td>
+                  <td>Propose a trade action based on the thesis</td>
+                  <td>Researcher thesis + market context</td>
+                  <td>Trade recommendation (buy/sell/hold)</td>
+                </tr>
+                <tr>
+                  <td>
+                    <span class="tag tag-red" style="white-space: nowrap"
+                      >Risk Manager</span
+                    >
+                  </td>
+                  <td>Evaluate and gate the trade for risk exposure</td>
+                  <td>Trader recommendation + portfolio state</td>
+                  <td>Approved / rejected decision + rationale</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <span class="dot"></span>Pipeline Architecture Flow
+          </div>
+          <div class="pipeline">
+            <span class="pipeline-node pn-indigo">Fundamentals Analyst</span>
+            <span class="pipe-arrow">+</span>
+            <span class="pipeline-node pn-cyan">Sentiment Analyst</span>
+            <span class="pipe-arrow">+</span>
+            <span class="pipeline-node pn-yellow">News Analyst</span>
+            <span class="pipe-arrow">+</span>
+            <span class="pipeline-node pn-green">Technical Analyst</span>
+            <span class="pipe-arrow">→</span>
+            <span class="pipeline-node pn-indigo">Researcher</span>
+            <span class="pipe-arrow">→</span>
+            <span class="pipeline-node pn-cyan">Trader</span>
+            <span class="pipe-arrow">→</span>
+            <span
+              class="pipeline-node pn-red"
+              style="
+                background: rgba(248, 113, 113, 0.12);
+                border-color: rgba(248, 113, 113, 0.3);
+                color: var(--red);
+              "
+              >Risk Manager</span
+            >
+            <span class="pipe-arrow">→</span>
+            <span class="pipeline-node pn-yellow">Fund Manager</span>
+          </div>
+          <p
+            style="font-size: 0.82rem; color: var(--muted); margin-top: 0.7rem"
+          >
+            The four analyst agents run in parallel. Their outputs converge at
+            the Researcher, which synthesizes a thesis that flows downstream
+            through Trader → Risk Manager → Fund Manager.
+          </p>
+        </div>
+      </div>
+
+      <!-- ════ SETUP ════ -->
+      <div class="tab-panel" id="tab-setup">
+        <div class="card">
+          <div class="card-title"><span class="dot"></span>Requirements</div>
+          <ul class="req-list">
+            <li><span class="bullet">✓</span> Python 3.10 or newer</li>
+            <li>
+              <span class="bullet">✓</span> pip (standard Python package
+              manager)
+            </li>
+            <li>
+              <span class="bullet">✓</span> API key for at least one supported
+              LLM provider
+            </li>
+            <li>
+              <span class="bullet">✓</span> Optional: financial data API key
+              (Alpha Vantage, Yahoo Finance, etc.)
+            </li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><span class="dot"></span>Install</div>
+          <div class="code-label">Option A — pip</div>
+          <div class="code-block"><code>pip install tradingagents</code></div>
+          <div class="code-label" style="margin-top: 0.8rem">
+            Option B — clone from source
+          </div>
+          <div class="code-block">
+            <code
+              >git clone https://github.com/TauricResearch/TradingAgents cd
+              TradingAgents pip install -e .</code
+            >
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><span class="dot"></span>Quick Start</div>
+          <div class="code-block">
+            <code
+              >from tradingagents.graph.trading_graph import TradingAgentsGraph
+              from tradingagents.default_config import DEFAULT_CONFIG #
+              Configure your LLM provider config = DEFAULT_CONFIG.copy()
+              config["llm_provider"] = "openai" config["deep_think_llm"] =
+              "gpt-4o" config["quick_think_llm"] = "gpt-4o-mini"
+              config["max_debate_rounds"] = 2 # Initialize and run ta =
+              TradingAgentsGraph(debug=True, config=config) state, decision =
+              ta.propagate("NVDA", "2024-11-15") print(decision)</code
+            >
+          </div>
+        </div>
+
+        <div class="card" style="padding: 0; overflow: hidden">
+          <div
+            style="
+              padding: 1.1rem 1.4rem 0.6rem;
+              font-family: &quot;Space Grotesk&quot;, sans-serif;
+              font-size: 1rem;
+              font-weight: 600;
+              color: var(--text);
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
+            "
+          >
+            <span class="dot"></span>Supported LLM Providers
+          </div>
+          <div class="table-wrap" style="border: none; border-radius: 0">
+            <table>
+              <thead>
+                <tr>
+                  <th>Provider</th>
+                  <th>Config Key</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>OpenAI</td>
+                  <td><code style="color: var(--cyan)">openai</code></td>
+                  <td>GPT-4o, GPT-4o-mini recommended</td>
+                </tr>
+                <tr>
+                  <td>Google Gemini</td>
+                  <td><code style="color: var(--cyan)">google</code></td>
+                  <td>Gemini 1.5 Pro / Flash</td>
+                </tr>
+                <tr>
+                  <td>Anthropic</td>
+                  <td><code style="color: var(--cyan)">anthropic</code></td>
+                  <td>Claude 3.5 Sonnet / Haiku</td>
+                </tr>
+                <tr>
+                  <td>xAI</td>
+                  <td><code style="color: var(--cyan)">xai</code></td>
+                  <td>Grok-beta</td>
+                </tr>
+                <tr>
+                  <td>OpenRouter</td>
+                  <td><code style="color: var(--cyan)">openrouter</code></td>
+                  <td>Access 100+ models via one key</td>
+                </tr>
+                <tr>
+                  <td>Ollama</td>
+                  <td><code style="color: var(--cyan)">ollama</code></td>
+                  <td>Local inference, no API key needed</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ ARCHITECTURE ════ -->
+      <div class="tab-panel" id="tab-architecture">
+        <div class="card">
+          <div class="card-title"><span class="dot"></span>System Diagram</div>
+          <div class="flow-diagram">
+            <div class="flow-group">
+              <div class="flow-group-label">Analysts Team</div>
+              <div class="flow-agents">
+                <div class="flow-node analyst">
+                  <div class="flow-node-name">Fundamentals</div>
+                  <div class="flow-node-sub">SEC · Earnings</div>
+                </div>
+                <div class="flow-node analyst">
+                  <div class="flow-node-name">Sentiment</div>
+                  <div class="flow-node-sub">Reddit · X</div>
+                </div>
+                <div class="flow-node analyst">
+                  <div class="flow-node-name">News</div>
+                  <div class="flow-node-sub">Financial APIs</div>
+                </div>
+                <div class="flow-node analyst">
+                  <div class="flow-node-name">Technical</div>
+                  <div class="flow-node-sub">OHLCV · Indicators</div>
+                </div>
+              </div>
+            </div>
+            <div class="flow-arrow">
+              <div class="line"></div>
+              <div class="arrowhead">▼</div>
+            </div>
+            <div class="flow-node researcher">
+              <div class="flow-node-name">Researcher</div>
+              <div class="flow-node-sub">
+                Synthesizes bull &amp; bear thesis
+              </div>
+            </div>
+            <div class="flow-arrow">
+              <div class="line"></div>
+              <div class="arrowhead">▼</div>
+            </div>
+            <div class="flow-node trader">
+              <div class="flow-node-name">Trader</div>
+              <div class="flow-node-sub">Trade recommendation</div>
+            </div>
+            <div class="flow-arrow">
+              <div class="line"></div>
+              <div class="arrowhead">▼</div>
+            </div>
+            <div class="flow-node risk">
+              <div class="flow-node-name">Risk Manager</div>
+              <div class="flow-node-sub">Approve · Reject · Resize</div>
+            </div>
+            <div class="flow-arrow">
+              <div class="line"></div>
+              <div class="arrowhead">▼</div>
+            </div>
+            <div class="flow-node fund">
+              <div class="flow-node-name">Fund Manager</div>
+              <div class="flow-node-sub">Final portfolio decision</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <span class="dot"></span>Multi-Provider LLM Chain
+          </div>
+          <p
+            style="
+              color: var(--text2);
+              font-size: 0.88rem;
+              line-height: 1.75;
+              margin-bottom: 0.8rem;
+            "
+          >
+            Each agent node in the LangGraph pipeline can be configured
+            independently. You can run cheap/fast models (e.g., GPT-4o-mini,
+            Gemini Flash, Claude Haiku) on the analyst ingestion nodes and
+            reserve expensive reasoning models for the Researcher, Trader, and
+            Risk Manager decision nodes.
+          </p>
+          <div class="pipeline">
+            <span class="pipeline-node pn-green">Quick LLM</span>
+            <span class="pipe-arrow">→</span>
+            <span style="font-size: 0.8rem; color: var(--muted)">Analysts</span>
+            <span class="pipe-arrow">·</span>
+            <span class="pipeline-node pn-indigo">Deep LLM</span>
+            <span class="pipe-arrow">→</span>
+            <span style="font-size: 0.8rem; color: var(--muted)"
+              >Researcher / Trader / Risk</span
+            >
+          </div>
+        </div>
+
+        <div class="box warn">
+          <span class="box-icon">⚠</span>
+          <div>
+            Designed primarily for equities and macroeconomic analysis. Crypto
+            assets require prompt-level tuning — on-chain signals and tokenomics
+            context are not included by default.
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ LLM SUPPORT ════ -->
+      <div class="tab-panel" id="tab-llm">
+        <div class="card" style="padding: 0; overflow: hidden">
+          <div
+            style="
+              padding: 1.1rem 1.4rem 0.6rem;
+              font-family: &quot;Space Grotesk&quot;, sans-serif;
+              font-size: 1rem;
+              font-weight: 600;
+              color: var(--text);
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
+            "
+          >
+            <span class="dot"></span>Provider × Model Matrix
+          </div>
+          <div class="table-wrap" style="border: none; border-radius: 0">
+            <table>
+              <thead>
+                <tr>
+                  <th>Provider</th>
+                  <th>Recommended Models</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>OpenAI</td>
+                  <td>
+                    <code style="color: var(--cyan)">gpt-4o</code> /
+                    <code style="color: var(--cyan)">gpt-4o-mini</code>
+                  </td>
+                  <td>Best default choice; strong tool-use and reasoning</td>
+                </tr>
+                <tr>
+                  <td>Google Gemini</td>
+                  <td>
+                    <code style="color: var(--cyan)">gemini-1.5-pro</code> /
+                    <code style="color: var(--cyan)">gemini-flash</code>
+                  </td>
+                  <td>
+                    Large context window; Flash is cost-efficient for analysts
+                  </td>
+                </tr>
+                <tr>
+                  <td>Anthropic</td>
+                  <td>
+                    <code style="color: var(--cyan)">claude-3-5-sonnet</code> /
+                    <code style="color: var(--cyan)">claude-haiku</code>
+                  </td>
+                  <td>Excellent for nuanced risk and sentiment reasoning</td>
+                </tr>
+                <tr>
+                  <td>xAI</td>
+                  <td><code style="color: var(--cyan)">grok-beta</code></td>
+                  <td>
+                    Real-time X/Twitter data affinity; strong news analyst
+                  </td>
+                </tr>
+                <tr>
+                  <td>OpenRouter</td>
+                  <td>Any model in the catalog</td>
+                  <td>Mix models across providers via one unified API key</td>
+                </tr>
+                <tr>
+                  <td>Ollama</td>
+                  <td>
+                    <code style="color: var(--cyan)">llama3</code> /
+                    <code style="color: var(--cyan)">mistral</code> /
+                    <code style="color: var(--cyan)">qwen2</code>
+                  </td>
+                  <td>
+                    Fully local, no cost per call — lower reasoning ceiling
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="box warn">
+          <span class="box-icon">⚠</span>
+          <div>
+            <strong>Cost heads-up:</strong> Running the full 7-agent pipeline on
+            a single ticker = multiple LLM calls per query. On GPT-4o across all
+            nodes, a single run can cost $0.05–$0.30+. Budget accordingly — use
+            fast/cheap models on analyst nodes and reserve deep models for
+            decision nodes.
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <span class="dot"></span>Provider Config Example
+          </div>
+          <div class="code-block">
+            <code
+              ># .env or config dict OPENAI_API_KEY=sk-...
+              ANTHROPIC_API_KEY=sk-ant-... GOOGLE_API_KEY=... XAI_API_KEY=...
+              OPENROUTER_API_KEY=... # In config dict config["llm_provider"] =
+              "openai" # primary provider config["deep_think_llm"] = "gpt-4o" #
+              Researcher / Trader / Risk config["quick_think_llm"] =
+              "gpt-4o-mini" # all 4 Analyst nodes</code
+            >
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      Built by
+      <a href="https://github.com/Zyphyrs" style="color: inherit">Zyphyrs</a>
+      with Claude Code
+    </footer>
+
+    <script>
+      const tabs = document.querySelectorAll(".tab-btn");
+      const panels = document.querySelectorAll(".tab-panel");
+
+      tabs.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const target = btn.dataset.tab;
+
+          tabs.forEach((t) => t.classList.remove("active"));
+          panels.forEach((p) => p.classList.remove("active"));
+
+          btn.classList.add("active");
+          document.getElementById("tab-" + target).classList.add("active");
+        });
+      });
+    </script>
+  </body>
+</html>
